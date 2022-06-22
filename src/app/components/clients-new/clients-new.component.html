@@ -1,0 +1,33 @@
+<h1 mat-dialog-title>Nowy klient</h1>
+<form [formGroup]="formGroup">
+    <div class="dialog-content">
+        <mat-form-field class="example-form-field" appearance="fill">
+            <mat-label>Imię</mat-label>
+            <input matInput type="text" formControlName="name" autocomplete="off">
+            <button *ngIf="formGroup.value.name" matSuffix mat-icon-button aria-label="Clear" (click)="this.formGroup.patchValue({name: ''});">
+              <mat-icon>close</mat-icon>
+            </button>
+        </mat-form-field>
+
+        <mat-form-field class="example-form-field" appearance="fill">
+            <mat-label>Nazwisko</mat-label>
+            <input matInput type="text" formControlName="surname">
+            <button *ngIf="formGroup.get('surname')?.value" matSuffix mat-icon-button aria-label="Clear" (click)="this.formGroup.patchValue({surname: ''});">
+              <mat-icon>close</mat-icon>
+            </button>
+        </mat-form-field>
+
+        <mat-form-field class="example-form-field" appearance="fill">
+            <mat-label>Adres e-mail</mat-label>
+            <input matInput type="text" formControlName="email">
+            <button *ngIf="formGroup.value.email" matSuffix mat-icon-button aria-label="Clear" (click)="this.formGroup.patchValue({email: ''});">
+              <mat-icon>close</mat-icon>
+            </button>
+        </mat-form-field>
+    </div>
+    
+    <div mat-dialog-actions align="end">
+      <button mat-button [mat-dialog-close]="client" (click)="save()">Zapisz</button>
+      <button mat-button mat-dialog-close (click)="cancel()">Anuluj</button>  
+    </div>
+</form>
