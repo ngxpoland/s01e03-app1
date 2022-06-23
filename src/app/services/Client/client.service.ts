@@ -1,21 +1,37 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Client } from 'src/app/models/client';
-import { CLIENTS_EXAMPLE_DATASET1 } from '../../fakeData/clients';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { APIStatus } from 'src/app/models/apiStatus';
+
+const API_URL = 'http://ngxpoland.com:3000';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ClientService {
+  httpOptions = {
+    headers: new HttpHeaders({
+      'Content-Type':  'application/json',
+      Authorization: 'my-auth-token'
+    })
+  };
   
-  constructor() { }
+  constructor(private http: HttpClient) {}
 
   public getClients(): Observable<Client[]> {
-    return of(CLIENTS_EXAMPLE_DATASET1);
-    // pobieranie danych z serwera (baza danych)
+    return this.http.get<Client[]>(API_URL+'/clients');
   }
 
-  public addClient(client: Client): void {
-    
+  public postClients(clients: Client[]): Observable<APIStatus> {
+    return this.http.post<APIStatus>(API_URL+'/clients', clients, this.httpOptions);
+  }
+
+  public putClient(client: Client): Observable<APIStatus> {
+    return this.http.put<APIStatus>(API_URL+'/client/'+client.id, client, this.httpOptions);
+  }
+
+  public deleteClient(client: Client): Observable<APIStatus> {
+    return this.http.delete<APIStatus>(API_URL+'/client/'+client.id, this.httpOptions);
   }
 }

@@ -1,5 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Client } from 'src/app/models/client';
+import { APIStatus } from 'src/app/models/apiStatus';
 import { ClientService } from 'src/app/services/Client/client.service';
 import { ClientsNewComponent } from '../clients-new/clients-new.component';
 
@@ -11,13 +13,9 @@ import { ClientsNewComponent } from '../clients-new/clients-new.component';
 export class ClientsListComponent implements OnInit {
   @Input() isToolbarVisible: boolean = true;
   public dialogRef: any;
-  displayedColumns: string[] = ['id', 'name', 'surname', 'email'];
-
-  // public clients = [
-  //   { id: 1, name: 'Jan', surname: 'Kowalski'},
-  //   { id: 2, name: 'Adam', surname: 'Nowak'},
-  //   { id: 3, name: 'Anna', surname: 'Kwiatkowska'},
-  // ];
+  displayedColumns: string[] = ['select', 'id', 'name', 'surname', 'email', 'phone'];
+  clients: Client[] = [];
+  clientSelection: Client[] = [];
 
   constructor(
     public clientService: ClientService,
@@ -25,7 +23,29 @@ export class ClientsListComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.clientService.getClients().subscribe((data: Client[]) => {
+      console.log(data);
+      this.clients = data;
+    });
 
+    /* Example: RESTfull API calls
+
+    this.clientService.deleteClient({ id: 10 }).subscribe((status: APIStatus) => {
+      console.log("delete status: ", status);
+    });
+
+    this.clientService.postClients([{ id: 0, name: 'Aleksander', surname: 'Wielki', email: 'awielki@o2.pl', phone: '123 456 999'}]).subscribe((status: APIStatus) => {
+      console.log("status: ", status)
+    });
+
+    this.clientService.putClient({ id: 12, name: 'Piotr', surname: 'Sójka', email: 'psojka@wp.pl', phone: '601 634 352'}).subscribe((status: APIStatus) => {
+      console.log("put status: ", status)
+    });
+
+    this.clientService.deleteClient({ id: 10 }).subscribe((status: APIStatus) => {
+      console.log("delete status: ", status)
+    });
+    */
   }
 
   openAddDialog() {
@@ -42,9 +62,14 @@ export class ClientsListComponent implements OnInit {
         }
       }
     );
-    this.dialogRef.afterClosed().subscribe((result: any) => {
+    this.dialogRef.afterClosed().subscribe((result: Client) => {
       console.log('The dialog was closed', result);
-      
+      if (result) {
+        this.clientService.postClients([result]).subscribe((status: APIStatus) => {
+          console.log('status: ', status);
+          // TODO: Dodać nieinwazyjny komunikat o pomyślnym dodaniu użytkownika i wykonać refresh listy
+        });
+      }
     });
   }
 
@@ -53,11 +78,21 @@ export class ClientsListComponent implements OnInit {
   }
 
   public handleEdit(): void {
-    alert('Not implemented!');
+    const str = JSON.stringify(this.clientSelection);
+    alert('Edytowanie tych elementów: '+str);
   }
 
   public handleDelete(): void {
     alert('Not implemented!');
+  }
+
+  public checkboxHandler(event: any, row: any): void {
+    if (event.checked) {
+      this.clientSelection.push(row);
+    } else {
+      this.clientSelection.splice(this.clientSelection.indexOf(row), 1);
+    }
+    console.log(this.clientSelection);
   }
 
 }
